@@ -20,3 +20,10 @@ test("parseCSV yields only arrays", async () => {
     expect(Array.isArray(row)).toBe(true);
   }
 });
+
+//My New Tests
+const EMPTY_PEOPLE_CSV_PATH = path.join(__dirname, "../data/empty_people.csv"); 
+test("handles an empty CSV file", async () => {
+  const results = await parseCSV(EMPTY_PEOPLE_CSV_PATH);
+  expect(results).toEqual([]);
+});

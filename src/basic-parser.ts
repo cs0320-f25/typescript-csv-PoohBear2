@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as readline from "readline";
-
+import { z } from "zod";
 /**
  * This is a JSDoc comment. Similar to JavaDoc, it documents a public-facing
  * function for others to use. Most modern editors will show the comment when 
@@ -14,7 +14,11 @@ import * as readline from "readline";
  * @param path The path to the file being loaded.
  * @returns a "promise" to produce a 2-d array of cell values
  */
-export async function parseCSV(path: string): Promise<string[][]> {
+
+export async function parseCSV<T>(
+  path: string, 
+  schema?: z.ZodType<T>
+): Promise<string[][]> {
   // This initial block of code reads from a file in Node.js. The "rl"
   // value can be iterated over in a "for" loop. 
   const fileStream = fs.createReadStream(path);
@@ -25,13 +29,29 @@ export async function parseCSV(path: string): Promise<string[][]> {
   
   // Create an empty array to hold the results
   let result = []
+  let row = 0
   
   // We add the "await" here because file I/O is asynchronous. 
   // We need to force TypeScript to _wait_ for a row before moving on. 
   // More on this in class soon!
   for await (const line of rl) {
+    row++;
     const values = line.split(",").map((v) => v.trim());
-    result.push(values)
+    if(schema) {
+      const parse = schema.safeParse(values);
+      if(parse.success) {
+        result.push(values)
+      }
+      else {
+        throw new Error(
+          `Validation failed on row ${row}: ${parse.error.message}`
+        );
+      }
+    }
+    else {
+      result.push(values)
+    }
+
   }
   return result
 }
