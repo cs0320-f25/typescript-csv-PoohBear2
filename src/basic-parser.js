@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,33 +40,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
-    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
 };
 var __asyncValues = (this && this.__asyncValues) || function (o) {
     if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
@@ -44,8 +50,8 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseCSV = parseCSV;
-var fs = require("fs");
-var readline = require("readline");
+const fs = __importStar(require("fs"));
+const readline = __importStar(require("readline"));
 /**
  * This is a JSDoc comment. Similar to JavaDoc, it documents a public-facing
  * function for others to use. Most modern editors will show the comment when
@@ -59,55 +65,80 @@ var readline = require("readline");
  * @param path The path to the file being loaded.
  * @returns a "promise" to produce a 2-d array of cell values
  */
-function parseCSV(path) {
-    return __awaiter(this, void 0, void 0, function () {
-        var fileStream, rl, result, _a, rl_1, rl_1_1, line, values, e_1_1;
-        var _b, e_1, _c, _d;
-        return __generator(this, function (_e) {
-            switch (_e.label) {
-                case 0:
-                    fileStream = fs.createReadStream(path);
-                    rl = readline.createInterface({
-                        input: fileStream,
-                        crlfDelay: Infinity, // handle different line endings
-                    });
-                    result = [];
-                    _e.label = 1;
-                case 1:
-                    _e.trys.push([1, 6, 7, 12]);
-                    _a = true, rl_1 = __asyncValues(rl);
-                    _e.label = 2;
-                case 2: return [4 /*yield*/, rl_1.next()];
-                case 3:
-                    if (!(rl_1_1 = _e.sent(), _b = rl_1_1.done, !_b)) return [3 /*break*/, 5];
-                    _d = rl_1_1.value;
-                    _a = false;
-                    line = _d;
-                    values = line.split(",").map(function (v) { return v.trim(); });
-                    result.push(values);
-                    _e.label = 4;
-                case 4:
-                    _a = true;
-                    return [3 /*break*/, 2];
-                case 5: return [3 /*break*/, 12];
-                case 6:
-                    e_1_1 = _e.sent();
-                    e_1 = { error: e_1_1 };
-                    return [3 /*break*/, 12];
-                case 7:
-                    _e.trys.push([7, , 10, 11]);
-                    if (!(!_a && !_b && (_c = rl_1.return))) return [3 /*break*/, 9];
-                    return [4 /*yield*/, _c.call(rl_1)];
-                case 8:
-                    _e.sent();
-                    _e.label = 9;
-                case 9: return [3 /*break*/, 11];
-                case 10:
-                    if (e_1) throw e_1.error;
-                    return [7 /*endfinally*/];
-                case 11: return [7 /*endfinally*/];
-                case 12: return [2 /*return*/, result];
-            }
+function parseCSV(path, schema) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a, e_1, _b, _c, _d, e_2, _e, _f;
+        // This initial block of code reads from a file in Node.js. The "rl"
+        // value can be iterated over in a "for" loop. 
+        const fileStream = fs.createReadStream(path);
+        const rl = readline.createInterface({
+            input: fileStream,
+            crlfDelay: Infinity, // handle different line endings
         });
+        // Create an empty array to hold the results
+        let result = [];
+        let row = 0;
+        // We add the "await" here because file I/O is asynchronous. 
+        // We need to force TypeScript to _wait_ for a row before moving on. 
+        // More on this in class soon!
+        //If a shcema is provided, process rows into a typed array, with the type being the zod type the user gave us
+        if (schema) {
+            const result = [];
+            let rowNumber = 0;
+            try {
+                for (var _g = true, rl_1 = __asyncValues(rl), rl_1_1; rl_1_1 = yield rl_1.next(), _a = rl_1_1.done, !_a; _g = true) {
+                    _c = rl_1_1.value;
+                    _g = false;
+                    const line = _c;
+                    rowNumber++;
+                    //if line is empty, skip it
+                    if (line.trim().length === 0)
+                        continue;
+                    const values = line.split(",").map((v) => v.trim());
+                    const parseResult = schema.safeParse(values);
+                    if (parseResult.success) {
+                        // If parsing was successful, add the data to the result array
+                        result.push(parseResult.data);
+                    }
+                    else {
+                        // If parsing failed, close the readline interface and throw an error describing what the error was and on which row it happened on
+                        rl.close();
+                        throw new Error(`Validation failed on row ${rowNumber}: ${parseResult.error.message}`);
+                    }
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (!_g && !_a && (_b = rl_1.return)) yield _b.call(rl_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            return result;
+        }
+        else {
+            //If no schema is provided, just return a 2d array of strings (original behavior)
+            const result = [];
+            try {
+                for (var _h = true, rl_2 = __asyncValues(rl), rl_2_1; rl_2_1 = yield rl_2.next(), _d = rl_2_1.done, !_d; _h = true) {
+                    _f = rl_2_1.value;
+                    _h = false;
+                    const line = _f;
+                    //if line is empty, skip it
+                    if (line.trim().length === 0)
+                        continue;
+                    const values = line.split(",").map((v) => v.trim());
+                    result.push(values);
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (!_h && !_d && (_e = rl_2.return)) yield _e.call(rl_2);
+                }
+                finally { if (e_2) throw e_2.error; }
+            }
+            return result;
+        }
     });
 }
