@@ -1,6 +1,6 @@
 # Sprint 1: TypeScript CSV
 
-###LINK TO REPO: https://github.com/cs0320-f25/typescript-csv-PoohBear2
+### LINK TO REPO: https://github.com/cs0320-f25/typescript-csv-PoohBear2
 
 ### Task C: Proposing Enhancement
 
