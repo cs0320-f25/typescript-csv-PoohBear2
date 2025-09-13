@@ -57,9 +57,9 @@ If no delimiter is provided, the parser defaults to using a comma.
 
     Include your notes from above: what were your initial ideas, what did the LLM suggest, and how did the results differ by prompt? What resonated with you, and what didn’t? (3-5 sentences.)
 
+### Design Choices
    If I were a developer using this CSV parser, it would frustrate me if the parser could only handle data separated exclusively by commas, with no headers, and with a predefined limit of columns of data for each row. I want flexibility, such as being able to process csv files with no data, and a sense of security, such as a checker that ensures the passed data is in a csv format and notifies me when it isn’t. The LLM’s responses using the given prompt overlapped completely with my original ideas. After editing the original prompt so that the LLM could give me more specific edge cases on the types of data in my csv file, I liked one particular suggestion, which was how fields themselves could contain commas, semicolons, or some other delineator, which the CSV should handle as one thing rather than a list of things.
 
-### Design Choices
 
 ### 1340 Supplement
 
