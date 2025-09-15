@@ -35,8 +35,6 @@ test("handles an empty CSV file", async () => {
 const COMMAS_IN_FIELD_PATH = path.join(__dirname, "../data/commas_in_field.csv");
 test("fails to handle commas inside quoted fields", async () => {
   const results = await parseCSV(COMMAS_IN_FIELD_PATH);
-  // This is now the CORRECT assertion for your parser's flawed logic.
-  // It accounts for the .trim() removing the leading space from " vidi".
   expect(results[0]).toEqual(['Caesar', 'Julius', '"veni', 'vidi', 'vici"']);
 })
 
