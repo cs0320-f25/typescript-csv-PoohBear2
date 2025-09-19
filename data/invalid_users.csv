@@ -1,0 +1,4 @@
+id,email,role
+not-a-number,valid@email.com,Admin
+102,not-an-email,Viewer
+103,external@gmail.com,Editor

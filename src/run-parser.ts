@@ -12,7 +12,7 @@ async function main() {
 
   // Notice the difference between "of" and "in". One iterates over the entries, 
   // another iterates over the indexes only.
-  for(const record of results)
+  for await (const record of results)
     console.log(record)
   for(const record in results)
     console.log(record)

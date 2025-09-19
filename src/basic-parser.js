@@ -32,15 +32,6 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __asyncValues = (this && this.__asyncValues) || function (o) {
     if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
     var m = o[Symbol.asyncIterator], i;
@@ -48,97 +39,127 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
+var __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }
+var __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var g = generator.apply(thisArg, _arguments || []), i, q = [];
+    return i = Object.create((typeof AsyncIterator === "function" ? AsyncIterator : Object).prototype), verb("next"), verb("throw"), verb("return", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;
+    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }
+    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }
+    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
+    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
+    function fulfill(value) { resume("next", value); }
+    function reject(value) { resume("throw", value); }
+    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CSVParseError = void 0;
 exports.parseCSV = parseCSV;
 const fs = __importStar(require("fs"));
 const readline = __importStar(require("readline"));
 /**
- * This is a JSDoc comment. Similar to JavaDoc, it documents a public-facing
- * function for others to use. Most modern editors will show the comment when
- * mousing over this function name. Try it in run-parser.ts!
- *
- * File I/O in TypeScript is "asynchronous", meaning that we can't just
- * read the file and return its contents. You'll learn more about this
- * in class. For now, just leave the "async" and "await" where they are.
- * You shouldn't need to alter them.
+ * A custom error class for CSV parsing issues. It bundles detailed
+ * context to help developers debug invalid rows.
+ */
+class CSVParseError extends Error {
+    constructor(message, rowNumber, rawLine, zodError) {
+        super(message);
+        // Set the name for easy identification, e.g., `if (e instanceof CSVParseError)`
+        this.name = "CSVParseError";
+        this.rowNumber = rowNumber;
+        this.rawLine = rawLine;
+        this.zodError = zodError;
+    }
+}
+exports.CSVParseError = CSVParseError;
+/**
+ * An asynchronous generator that parses a CSV file, yielding one row at a time.
+ * This approach is memory-efficient and suitable for very large files.
  *
  * @param path The path to the file being loaded.
- * @returns a "promise" to produce a 2-d array of cell values
+ * @param schema An optional Zod schema to validate and type each data row.
+ * @param hasHeader A boolean indicating if the CSV has a header row. Defaults to false.
+ * @yields A `ParsedRecord<T>` for a valid row with a schema, a `string[]` for a
+ * valid row without a schema, or a `CSVParseError` for an invalid row.
  */
-function parseCSV(path, schema) {
-    return __awaiter(this, void 0, void 0, function* () {
-        var _a, e_1, _b, _c, _d, e_2, _e, _f;
-        // This initial block of code reads from a file in Node.js. The "rl"
-        // value can be iterated over in a "for" loop. 
+function parseCSV(path_1, schema_1) {
+    return __asyncGenerator(this, arguments, function* parseCSV_1(path, schema, hasHeader = false) {
+        var _a, e_1, _b, _c;
         const fileStream = fs.createReadStream(path);
         const rl = readline.createInterface({
             input: fileStream,
-            crlfDelay: Infinity, // handle different line endings
+            crlfDelay: Infinity,
         });
-        // Create an empty array to hold the results
-        let result = [];
-        let row = 0;
-        // We add the "await" here because file I/O is asynchronous. 
-        // We need to force TypeScript to _wait_ for a row before moving on. 
-        // More on this in class soon!
-        //If a shcema is provided, process rows into a typed array, with the type being the zod type the user gave us
-        if (schema) {
-            const result = [];
-            let rowNumber = 0;
-            try {
-                for (var _g = true, rl_1 = __asyncValues(rl), rl_1_1; rl_1_1 = yield rl_1.next(), _a = rl_1_1.done, !_a; _g = true) {
-                    _c = rl_1_1.value;
-                    _g = false;
-                    const line = _c;
-                    rowNumber++;
-                    //if line is empty, skip it
-                    if (line.trim().length === 0)
-                        continue;
-                    const values = line.split(",").map((v) => v.trim());
+        let headerRow = undefined;
+        let rowNumber = 0;
+        let isFirstRow = true;
+        try {
+            for (var _d = true, rl_1 = __asyncValues(rl), rl_1_1; rl_1_1 = yield __await(rl_1.next()), _a = rl_1_1.done, !_a; _d = true) {
+                _c = rl_1_1.value;
+                _d = false;
+                const line = _c;
+                rowNumber++;
+                if (line.trim().length === 0)
+                    continue;
+                // --- MODIFICATION START ---
+                // Replaced `line.split(',')` with a robust regex-based parser to correctly handle
+                // fields enclosed in double quotes, allowing them to contain commas.
+                const fields = [];
+                const regex = /(?:"((?:[^"]|"")*)"|([^,]*))(?:,|$)/g;
+                let match;
+                // This loop iterates through all successive matches of the regex on the string.
+                while ((match = regex.exec(line))) {
+                    // This check prevents an infinite loop on some empty lines.
+                    if (match.index === line.length && match[0] === "") {
+                        break;
+                    }
+                    // `match[1]` captures quoted content, `match[2]` captures unquoted.
+                    const quotedContent = match[1];
+                    const unquotedContent = match[2];
+                    // If the field was quoted, unescape any double-double-quotes ("") back to a single (").
+                    // Otherwise, use the unquoted content.
+                    const value = quotedContent !== undefined
+                        ? quotedContent.replace(/""/g, '"')
+                        : unquotedContent;
+                    fields.push(value);
+                }
+                if (line.endsWith(",")) {
+                    fields.push("");
+                }
+                // This regex pattern can leave an extra empty string if the line doesn't end
+                // with a comma. This removes that artifact for clean output.
+                if (fields.length > 1 && fields[fields.length - 1] === '' && !line.endsWith(',')) {
+                    fields.pop();
+                }
+                const values = fields;
+                // --- MODIFICATION END ---
+                if (isFirstRow && hasHeader) {
+                    headerRow = values;
+                    isFirstRow = false;
+                    continue;
+                }
+                isFirstRow = false;
+                if (schema) {
                     const parseResult = schema.safeParse(values);
                     if (parseResult.success) {
-                        // If parsing was successful, add the data to the result array
-                        result.push(parseResult.data);
+                        yield yield __await({ data: parseResult.data, headers: headerRow });
                     }
                     else {
-                        // If parsing failed, close the readline interface and throw an error describing what the error was and on which row it happened on
-                        rl.close();
-                        throw new Error(`Validation failed on row ${rowNumber}: ${parseResult.error.message}`);
+                        const message = `Validation failed on row ${rowNumber}.`;
+                        yield yield __await(new CSVParseError(message, rowNumber, line, parseResult.error));
                     }
                 }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (!_g && !_a && (_b = rl_1.return)) yield _b.call(rl_1);
+                else {
+                    yield yield __await(values);
                 }
-                finally { if (e_1) throw e_1.error; }
             }
-            return result;
         }
-        else {
-            //If no schema is provided, just return a 2d array of strings (original behavior)
-            const result = [];
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
             try {
-                for (var _h = true, rl_2 = __asyncValues(rl), rl_2_1; rl_2_1 = yield rl_2.next(), _d = rl_2_1.done, !_d; _h = true) {
-                    _f = rl_2_1.value;
-                    _h = false;
-                    const line = _f;
-                    //if line is empty, skip it
-                    if (line.trim().length === 0)
-                        continue;
-                    const values = line.split(",").map((v) => v.trim());
-                    result.push(values);
-                }
+                if (!_d && !_a && (_b = rl_1.return)) yield __await(_b.call(rl_1));
             }
-            catch (e_2_1) { e_2 = { error: e_2_1 }; }
-            finally {
-                try {
-                    if (!_h && !_d && (_e = rl_2.return)) yield _e.call(rl_2);
-                }
-                finally { if (e_2) throw e_2.error; }
-            }
-            return result;
+            finally { if (e_1) throw e_1.error; }
         }
     });
 }
